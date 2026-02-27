@@ -1,23 +1,32 @@
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.8.21"
-    id("org.jetbrains.intellij") version "1.13.3"
+    kotlin("jvm") version "1.9.22"
+    id("org.jetbrains.intellij") version "1.16.1"
 }
 
-group = "com.example"
+group = "com.example.plugin"
 version = "1.0-SNAPSHOT"
 
 repositories {
+    maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
     mavenCentral()
 }
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2022.2.5")
+    version.set("2023.1.7")
     type.set("IC") // Target IDE Platform
 
-    plugins.set(listOf(/* Plugin Dependencies */))
+    plugins.set(listOf("java"))
+}
+
+dependencies {
+    compileOnly("org.springframework.boot:spring-boot-starter-web:3.5.8")
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 tasks {
@@ -43,5 +52,9 @@ tasks {
 
     publishPlugin {
         token.set(System.getenv("PUBLISH_TOKEN"))
+    }
+
+    runIde {
+        jvmArgs("-Djb.vmOptionsFile=")
     }
 }

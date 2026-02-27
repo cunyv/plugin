@@ -5,22 +5,36 @@
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>Plugin</name>
+    <name>ApiNavigator</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="support@yourcompany.com" url="https://www.yourcompany.com">YourCompany</vendor>
+    <vendor email="2468697909@qq.com" url="https://www.yourcompany.com">项泓</vendor>
 
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
-    <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
-  ]]></description>
+    <description>该插件用于快速跳转api，主要针对于springboot项目的接口搜索，输入api名称即可快速跳转至对应方法</description>
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <actions>
+        <action id="ApiNavigatorAction"
+                class="com.example.plugin.ApiNavigatorAction"
+                text="跳转到接口方法"
+                description="输入完整接口路径跳转">
+            <!-- 放到 Tools 菜单（可选） -->
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+
+            <!-- Windows / Linux 快捷键 -->
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt G"/>
+
+            <!-- Mac OS X 快捷键 -->
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="control alt G"/>
+        </action>
+    </actions>
 
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
@@ -28,3 +42,25 @@
 
     </extensions>
 </idea-plugin>
+
+<!--<idea-plugin>-->
+<!--<id>com.example.apinavigator</id>-->
+<!--<name>Spring Boot API Navigator</name>-->
+<!--<version>1.0</version>-->
+<!--<vendor>Example</vendor>-->
+
+<!--<description>-->
+<!--    该插件用于快速跳转api，主要针对于springboot项目的接口搜索，输入api名称即可快速跳转至对应方法-->
+<!--</description>-->
+
+<!--<depends>com.intellij.modules.java</depends>-->
+
+<!--<actions>-->
+<!--    <action id="ApiNavigatorAction"-->
+<!--            class="com.example.plugin.ApiNavigatorAction"-->
+<!--            text="跳转到接口方法"-->
+<!--            description="输入完整接口路径跳转">-->
+<!--        <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt G"/>-->
+<!--    </action>-->
+<!--</actions>-->
+<!--</idea-plugin>-->
