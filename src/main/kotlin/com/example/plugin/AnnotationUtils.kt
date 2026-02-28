@@ -36,10 +36,27 @@ object AnnotationUtils {
     private fun getPath(annotation: PsiAnnotation?): String? {
         if (annotation == null) return null
 
-        val value = annotation.findAttributeValue("value")
-            ?: annotation.findAttributeValue("path")
-            ?: return null
+        val attr = annotation.findDeclaredAttributeValue("value")
+                ?: annotation.findDeclaredAttributeValue("path")
+                ?: return null
 
-        return value.text.trim('"')
+        val text = attr.text.trim()
+
+        // 情况1：单字符串
+        if (text.startsWith("\"")) {
+            return text.removeSurrounding("\"")
+        }
+
+        // 情况2：数组 {"a", "b"}
+        if (text.startsWith("{") && text.endsWith("}")) {
+            val inside = text.removePrefix("{").removeSuffix("}")
+            val first = inside.split(",")
+                    .map { it.trim() }
+                    .firstOrNull() ?: return null
+
+            return first.removeSurrounding("\"")
+        }
+
+        return null
     }
 }

@@ -29,7 +29,7 @@ object ApiFinder {
                     val fullPath = combinePaths(classPath, methodPath)
                     val regexPath = fullPath.replace(Regex("\\{[^/]+}"), "[^/]+") // 支持路径参数
 
-                    if (Pattern.matches(regexPath, inputPath)) {
+                    if (matchPath(regexPath, inputPath)) {
                         matches.add("${psiClass.qualifiedName}.${method.name} → $fullPath")
                     }
                 }
@@ -56,7 +56,7 @@ object ApiFinder {
                     val fullPath = combinePaths(classPath, methodPath)
                     val regexPath = fullPath.replace(Regex("\\{[^/]+}"), "[^/]+") // 支持路径参数
 
-                    if (Pattern.matches(regexPath, inputPath)) {
+                    if (matchPath(regexPath, inputPath)) {
                         val descriptor = OpenFileDescriptor(
                                 project,
                                 method.containingFile.virtualFile,
@@ -69,6 +69,17 @@ object ApiFinder {
             }
         }
         return false
+    }
+
+    private fun matchPath(requestPath: String, inputPath: String): Boolean {
+        if (requestPath.isBlank()) return false
+        if (requestPath.contains("{}")) return false
+
+        val regex = requestPath
+                .replace(Regex("\\{[^/]+}"), "[^/]+") // 把 {id} 转换成正则
+                .replace("//", "/")
+
+        return Regex("^$regex$").matches(inputPath)
     }
 
     /**
