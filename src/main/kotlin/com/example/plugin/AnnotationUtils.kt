@@ -3,7 +3,6 @@ package com.example.plugin
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiMethod
-import com.intellij.openapi.project.Project
 
 object AnnotationUtils {
 
