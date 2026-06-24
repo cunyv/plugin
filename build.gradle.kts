@@ -22,6 +22,7 @@ intellij {
 }
 
 dependencies {
+    // Spring Boot annotations for PSI resolution
     compileOnly("org.springframework.boot:spring-boot-starter-web:3.5.8")
 }
 
@@ -40,8 +41,8 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("222")
-        untilBuild.set("232.*")
+        sinceBuild.set("231")
+        untilBuild.set("243.*")
     }
 
     signPlugin {

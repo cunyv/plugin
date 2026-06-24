@@ -10,40 +10,12 @@ import com.intellij.psi.PsiMethod
 
 class ApiNavigatorAction : AnAction() {
 
-//    override fun actionPerformed(e: AnActionEvent) {
-//        val project = e.project ?: return
-//
-//        val inputPath = Messages.showInputDialog(
-//            project,
-//            "请输入完整接口路径，例如 /user/update",
-//            "跳转到接口方法",
-//            Messages.getQuestionIcon()
-//        ) ?: return
-//
-//        val matched = ApiFinder.findMatches(project, inputPath)
-//
-//        when {
-//            matched.isEmpty() ->
-//                Messages.showInfoMessage(project, "未找到接口: $inputPath", "结果")
-//
-//            matched.size == 1 ->
-//                ApiFinder.navigate(project, inputPath)
-//
-//            else ->
-//                Messages.showInfoMessage(
-//                    project,
-//                    "找到多个匹配:\n${matched.joinToString("\n")}",
-//                    "匹配结果"
-//                )
-//        }
-//    }
-
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
 
         val input = Messages.showInputDialog(
                 project,
-                "请输入完整接口路径：",
+                "请输入接口路径（支持不带斜杠，如 test/list）：",
                 "跳转到接口方法",
                 Messages.getQuestionIcon()
         ) ?: return

@@ -42,25 +42,3 @@
 
     </extensions>
 </idea-plugin>
-
-<!--<idea-plugin>-->
-<!--<id>com.example.apinavigator</id>-->
-<!--<name>Spring Boot API Navigator</name>-->
-<!--<version>1.0</version>-->
-<!--<vendor>Example</vendor>-->
-
-<!--<description>-->
-<!--    该插件用于快速跳转api，主要针对于springboot项目的接口搜索，输入api名称即可快速跳转至对应方法-->
-<!--</description>-->
-
-<!--<depends>com.intellij.modules.java</depends>-->
-
-<!--<actions>-->
-<!--    <action id="ApiNavigatorAction"-->
-<!--            class="com.example.plugin.ApiNavigatorAction"-->
-<!--            text="跳转到接口方法"-->
-<!--            description="输入完整接口路径跳转">-->
-<!--        <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt G"/>-->
-<!--    </action>-->
-<!--</actions>-->
-<!--</idea-plugin>-->
