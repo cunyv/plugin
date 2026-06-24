@@ -18,6 +18,13 @@
 输入接口路径，例如：`/system/user/123` 或 `system/user/123`
 插件会自动匹配：`/system/user/{id}` 并跳转到对应方法。
 
+### 🔎 模糊搜索
+
+支持不完整路径匹配：
+- 输入 `user/list` 可以匹配 `/system/user/list`
+- 输入 `testApi` 可以匹配 `/test/testApi`
+- 支持路径变量匹配：输入 `user/123` 可以匹配 `/user/{id}`
+
 ---
 
 ### ⚡ 仅扫描 Controller 类（高性能）
@@ -72,6 +79,13 @@
 - 显示：`[GET] 类名.方法名 → 完整路径`
 - 支持 HTTP 方法类型显示（GET/POST/PUT/DELETE）
 - 选择后跳转
+
+### 📝 搜索历史记录
+
+自动保存搜索历史，支持快速选择：
+- 最多保存 20 条历史记录
+- 持久化存储，重启 IDE 后仍然有效
+- 支持从历史记录中快速选择
 
 ---
 
@@ -167,6 +181,7 @@ plugin/
 ├── ApiFinder.kt            # Controller 扫描与匹配逻辑
 ├── ApiNavigatorAction.kt   # 快捷键入口与弹窗选择
 ├── AnnotationUtils.kt      # 注解解析工具
+├── HistoryManager.kt       # 搜索历史记录管理
 └── META-INF/plugin.xml     # 插件配置
 ```
 
@@ -190,13 +205,14 @@ plugin/
 - ✔ 显示 HTTP 方法类型（GET/POST/PUT/DELETE）
 - ✔ Controller 缓存优化
 - ✔ 路径自动规范化
+- ✔ 模糊搜索
+- ✔ 搜索历史记录
 
 ---
 
 ## 🚀 后续可扩展方向
 
 - 支持 HTTP Method 过滤（只搜索 GET/POST）
-- 支持模糊搜索
 - 支持 Swagger/OpenAPI 注解识别
 - 支持 Kotlin Controller
 

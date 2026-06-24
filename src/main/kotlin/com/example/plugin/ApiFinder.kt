@@ -55,11 +55,55 @@ object ApiFinder {
         val normalizedRequest = normalizePath(requestPath) ?: return false
         val normalizedInput = normalizePath(inputPath) ?: return false
 
+        // 精确匹配：将路径变量转换为正则
         val regex = normalizedRequest
             .replace(Regex("\\{[^/]+}"), "[^/]+")
             .replace(Regex("/+"), "/")
 
-        return Regex("^$regex$").matches(normalizedInput)
+        // 1. 尝试精确匹配
+        if (Regex("^$regex$").matches(normalizedInput)) {
+            return true
+        }
+
+        // 2. 模糊匹配：输入路径的任意部分匹配
+        // 例如：输入 user/list 可以匹配 /system/user/list
+        //        输入 test 可以匹配 /test/testApi
+        val inputParts = normalizedInput.split("/").filter { it.isNotEmpty() }
+        val requestParts = normalizedRequest.split("/").filter { it.isNotEmpty() }
+
+        // 如果输入部分比请求部分长，不可能匹配
+        if (inputParts.size > requestParts.size) {
+            return false
+        }
+
+        // 检查输入的每个部分是否在请求路径的对应部分中包含
+        // 使用滑动窗口的方式匹配
+        for (i in 0..requestParts.size - inputParts.size) {
+            var allMatch = true
+            for (j in inputParts.indices) {
+                val requestPart = requestParts[i + j]
+                val inputPart = inputParts[j]
+                val isPathVariable = requestPart.matches(Regex("\\{[^/]+}"))
+
+                // 路径变量只能匹配数字，不能匹配字母
+                if (isPathVariable) {
+                    // 只有当输入部分是纯数字时，才匹配路径变量
+                    if (!inputPart.matches(Regex("\\d+"))) {
+                        allMatch = false
+                        break
+                    }
+                } else {
+                    // 非路径变量需要包含匹配
+                    if (!requestPart.contains(inputPart, ignoreCase = true)) {
+                        allMatch = false
+                        break
+                    }
+                }
+            }
+            if (allMatch) return true
+        }
+
+        return false
     }
 
     /**
