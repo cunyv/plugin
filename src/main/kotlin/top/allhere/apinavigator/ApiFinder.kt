@@ -16,10 +16,10 @@ object ApiFinder {
     private val CACHE_VALIDITY_MS = 60_000 // 缓存有效期 1 分钟
 
     /**
-     * 返回匹配输入路径的接口描述列表
+     * 返回匹配输入路径的接口结果列表
      */
-    fun findMatches(project: Project, inputPath: String): List<Pair<String, PsiMethod>> {
-        val matches = mutableListOf<Pair<String, PsiMethod>>()
+    fun findMatches(project: Project, inputPath: String): List<ApiMatchResult> {
+        val matches = mutableListOf<ApiMatchResult>()
         val controllers = findControllers(project)
 
         for (psiClass in controllers) {
@@ -31,14 +31,50 @@ object ApiFinder {
                 for (methodPath in methodPaths) {
                     val fullPath = combinePaths(classPath, methodPath)
                     if (matchPath(fullPath, inputPath)) {
-                        val label = "[$httpMethod] ${psiClass.qualifiedName}.${method.name} → $fullPath"
-                        matches.add(label to method)
+                        matches.add(ApiMatchResult(
+                            httpMethod = httpMethod,
+                            fullPath = fullPath,
+                            className = psiClass.qualifiedName ?: "",
+                            methodName = method.name,
+                            psiMethod = method
+                        ))
                     }
                 }
             }
         }
 
         return matches
+    }
+
+    /**
+     * 返回所有接口列表（用于初始显示）
+     */
+    fun findAll(project: Project): List<ApiMatchResult> {
+        val allApis = mutableListOf<ApiMatchResult>()
+        val controllers = findControllers(project)
+
+        for (psiClass in controllers) {
+            val classPath = AnnotationUtils.getClassMapping(psiClass) ?: ""
+
+            for (method in psiClass.methods) {
+                val methodPaths = AnnotationUtils.getMethodMappings(method)
+                val httpMethod = AnnotationUtils.getHttpMethod(method)
+                for (methodPath in methodPaths) {
+                    val fullPath = combinePaths(classPath, methodPath)
+                    if (fullPath.isNotBlank()) {
+                        allApis.add(ApiMatchResult(
+                            httpMethod = httpMethod,
+                            fullPath = fullPath,
+                            className = psiClass.qualifiedName ?: "",
+                            methodName = method.name,
+                            psiMethod = method
+                        ))
+                    }
+                }
+            }
+        }
+
+        return allApis
     }
 
     /**

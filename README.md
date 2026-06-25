@@ -1,7 +1,7 @@
 # Spring Boot API Navigator
 
 **插件 ID**: `top.allhere.apinavigator`
-**版本**: 1.0-SNAPSHOT
+**版本**: 2.0.1
 **适用 IDE**: IntelliJ IDEA 2023.1+ (Community 或 Ultimate)
 **JDK**: 17
 
@@ -72,13 +72,19 @@
 
 ---
 
-### 🎯 多结果弹窗选择
+### 🎯 Search Everywhere 风格弹窗
 
-当匹配到多个接口时：
-- 自动弹出选择框
-- 显示：`[GET] 类名.方法名 → 完整路径`
-- 支持 HTTP 方法类型显示（GET/POST/PUT/DELETE）
-- 选择后跳转
+现代化的搜索体验：
+- 弹窗打开即显示所有 API 列表
+- 支持实时搜索过滤（输入即过滤）
+- HTTP 方法用不同颜色标注：
+  - 🟢 **GET** - 绿色
+  - 🔵 **POST** - 蓝色
+  - 🟠 **PUT** - 橙色
+  - 🔴 **DELETE** - 红色
+- 显示格式：`[GET] /api/users/{id}  UserController.getUserById`
+- 支持键盘上下导航、回车跳转
+- 弹窗可移动、可调整大小
 
 ### 📝 搜索历史记录
 
@@ -181,6 +187,8 @@ api-navigator/
 ├── src/main/kotlin/top/allhere/apinavigator/
 │   ├── ApiFinder.kt            # Controller 扫描与匹配逻辑
 │   ├── ApiNavigatorAction.kt   # 快捷键入口与弹窗选择
+│   ├── ApiMatchResult.kt       # API 匹配结果数据类
+│   ├── ApiListCellRenderer.kt  # 自定义列表渲染器（颜色标注）
 │   ├── AnnotationUtils.kt      # 注解解析工具
 │   └── HistoryManager.kt       # 搜索历史记录管理
 └── src/main/resources/META-INF/
@@ -203,8 +211,9 @@ api-navigator/
 - ✔ 支持不带斜杠的路径
 - ✔ 支持路径变量
 - ✔ 支持数组 mapping
-- ✔ 多结果选择弹窗
-- ✔ 显示 HTTP 方法类型（GET/POST/PUT/DELETE）
+- ✔ Search Everywhere 风格弹窗
+- ✔ 实时搜索过滤
+- ✔ HTTP 方法颜色标注（GET/POST/PUT/DELETE）
 - ✔ Controller 缓存优化
 - ✔ 路径自动规范化
 - ✔ 模糊搜索

@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "top.allhere"
-version = "1.0-SNAPSHOT"
+version = "2.0.1"
 
 repositories {
     maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
