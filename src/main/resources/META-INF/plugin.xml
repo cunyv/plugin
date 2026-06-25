@@ -13,7 +13,20 @@
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
-    <description>该插件用于快速跳转api，主要针对于springboot项目的接口搜索，输入api名称即可快速跳转至对应方法</description>
+    <description><![CDATA[
+        A powerful IntelliJ IDEA plugin for Spring Boot projects that allows you to quickly navigate to API endpoints by typing the interface path.
+
+        Features:
+        <ul>
+            <li>Quick navigation to Controller methods by API path</li>
+            <li>Support for path variables like /user/{id}</li>
+            <li>Fuzzy search support</li>
+            <li>HTTP method color coding (GET/POST/PUT/DELETE)</li>
+            <li>Search Everywhere style popup</li>
+        </ul>
+
+        Shortcut: Ctrl+Alt+G (Windows/Linux), Control+Option+G (macOS)
+    ]]></description>
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
