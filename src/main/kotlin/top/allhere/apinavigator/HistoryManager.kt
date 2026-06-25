@@ -1,4 +1,4 @@
-package com.example.plugin
+package top.allhere.apinavigator
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent

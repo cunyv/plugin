@@ -1,4 +1,4 @@
-package com.example.plugin
+package top.allhere.apinavigator
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass

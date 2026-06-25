@@ -17,6 +17,4 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "plugin"
-
-rootProject.name = "plugin"
+rootProject.name = "api-navigator"

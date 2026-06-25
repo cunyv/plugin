@@ -1,6 +1,6 @@
 # Spring Boot API Navigator
 
-**插件 ID**: `com.example.plugin`
+**插件 ID**: `top.allhere.apinavigator`
 **版本**: 1.0-SNAPSHOT
 **适用 IDE**: IntelliJ IDEA 2023.1+ (Community 或 Ultimate)
 **JDK**: 17
@@ -144,7 +144,7 @@ Tools → 跳转到接口方法
 生成文件位置：
 
 ```text
-build/distributions/plugin-xxx.zip
+build/distributions/api-navigator-xxx.zip
 ```
 
 安装步骤：
@@ -177,12 +177,14 @@ build/distributions/plugin-xxx.zip
 ## 📁 项目结构
 
 ```text
-plugin/
-├── ApiFinder.kt            # Controller 扫描与匹配逻辑
-├── ApiNavigatorAction.kt   # 快捷键入口与弹窗选择
-├── AnnotationUtils.kt      # 注解解析工具
-├── HistoryManager.kt       # 搜索历史记录管理
-└── META-INF/plugin.xml     # 插件配置
+api-navigator/
+├── src/main/kotlin/top/allhere/apinavigator/
+│   ├── ApiFinder.kt            # Controller 扫描与匹配逻辑
+│   ├── ApiNavigatorAction.kt   # 快捷键入口与弹窗选择
+│   ├── AnnotationUtils.kt      # 注解解析工具
+│   └── HistoryManager.kt       # 搜索历史记录管理
+└── src/main/resources/META-INF/
+    └── plugin.xml               # 插件配置
 ```
 
 ---
