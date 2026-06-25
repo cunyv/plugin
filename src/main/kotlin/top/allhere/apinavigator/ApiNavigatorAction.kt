@@ -4,12 +4,14 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.popup.JBPopup
+import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.JBUI
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Dimension
 import java.awt.event.*
 import javax.swing.*
 import javax.swing.event.DocumentEvent
@@ -31,129 +33,118 @@ class ApiNavigatorAction : AnAction() {
     }
 
     private fun showSearchPopup(project: Project, allApis: List<ApiMatchResult>) {
-        val dialog = ApiSearchDialog(project, allApis)
-        dialog.show()
-    }
+        // 创建列表模型 - 初始为空
+        val listModel = DefaultListModel<ApiMatchResult>()
+        val list = JBList(listModel)
+        list.cellRenderer = ApiListCellRenderer()
+        list.selectionMode = ListSelectionModel.SINGLE_SELECTION
+        list.emptyText.text = "输入路径搜索接口..."
 
-    private class ApiSearchDialog(
-        private val project: Project,
-        private val allApis: List<ApiMatchResult>
-    ) : DialogWrapper(project, true) {
+        // 创建搜索输入框
+        val searchField = JBTextField()
+        searchField.font = searchField.font.deriveFont(14f)
+        searchField.border = JBUI.Borders.empty(8)
 
-        private lateinit var searchField: JBTextField
-        private lateinit var list: JBList<ApiMatchResult>
-        private lateinit var listModel: DefaultListModel<ApiMatchResult>
+        // 搜索过滤逻辑
+        searchField.document.addDocumentListener(object : DocumentListener {
+            override fun insertUpdate(e: DocumentEvent) = filterList()
+            override fun removeUpdate(e: DocumentEvent) = filterList()
+            override fun changedUpdate(e: DocumentEvent) = filterList()
 
-        init {
-            title = "API Navigator"
-            setSize(650, 450)
-            isModal = false
-            init()
-        }
-
-        override fun createCenterPanel(): JComponent {
-            val panel = JPanel(BorderLayout())
-
-            // 列表模型 - 初始为空
-            listModel = DefaultListModel()
-            list = JBList(listModel)
-            list.cellRenderer = ApiListCellRenderer()
-            list.selectionMode = ListSelectionModel.SINGLE_SELECTION
-            list.emptyText.text = "输入路径搜索接口..."
-
-            // 鼠标双击跳转
-            list.addMouseListener(object : MouseAdapter() {
-                override fun mouseClicked(e: MouseEvent) {
-                    if (e.clickCount == 2) {
-                        navigateToSelected()
-                    }
+            private fun filterList() {
+                val searchText = searchField.text.trim().lowercase()
+                listModel.clear()
+                if (searchText.isNotEmpty()) {
+                    allApis.filter { api ->
+                        api.fullPath.lowercase().contains(searchText) ||
+                        api.httpMethod.lowercase().contains(searchText)
+                    }.forEach { listModel.addElement(it) }
                 }
-            })
+                if (listModel.size > 0) {
+                    list.selectedIndex = 0
+                }
+            }
+        })
 
-            // 搜索框
-            searchField = JBTextField()
-            searchField.font = searchField.font.deriveFont(14f)
-            searchField.border = JBUI.Borders.empty(8)
+        // 创建弹窗
+        var popup: JBPopup? = null
 
-            // 搜索过滤
-            searchField.document.addDocumentListener(object : DocumentListener {
-                override fun insertUpdate(e: DocumentEvent) = filterList()
-                override fun removeUpdate(e: DocumentEvent) = filterList()
-                override fun changedUpdate(e: DocumentEvent) = filterList()
-            })
-
-            // 键盘导航
-            searchField.addKeyListener(object : KeyAdapter() {
-                override fun keyPressed(e: KeyEvent) {
-                    when (e.keyCode) {
-                        KeyEvent.VK_DOWN -> {
-                            e.consume()
-                            val index = list.selectedIndex
-                            if (index < listModel.size - 1) {
-                                list.selectedIndex = index + 1
-                                list.ensureIndexIsVisible(list.selectedIndex)
-                            }
-                        }
-                        KeyEvent.VK_UP -> {
-                            e.consume()
-                            val index = list.selectedIndex
-                            if (index > 0) {
-                                list.selectedIndex = index - 1
-                                list.ensureIndexIsVisible(list.selectedIndex)
-                            }
-                        }
-                        KeyEvent.VK_ENTER -> {
-                            e.consume()
-                            navigateToSelected()
+        // 键盘导航
+        searchField.addKeyListener(object : KeyAdapter() {
+            override fun keyPressed(e: KeyEvent) {
+                when (e.keyCode) {
+                    KeyEvent.VK_DOWN -> {
+                        e.consume()
+                        val index = list.selectedIndex
+                        if (index < listModel.size - 1) {
+                            list.selectedIndex = index + 1
+                            list.ensureIndexIsVisible(list.selectedIndex)
                         }
                     }
+                    KeyEvent.VK_UP -> {
+                        e.consume()
+                        val index = list.selectedIndex
+                        if (index > 0) {
+                            list.selectedIndex = index - 1
+                            list.ensureIndexIsVisible(list.selectedIndex)
+                        }
+                    }
+                    KeyEvent.VK_ENTER -> {
+                        e.consume()
+                        val selected = list.selectedValue
+                        if (selected != null) {
+                            navigateTo(project, selected.psiMethod)
+                            HistoryManager.getInstance().addHistory(selected.fullPath)
+                            popup?.cancel()
+                        }
+                    }
+                    KeyEvent.VK_ESCAPE -> {
+                        e.consume()
+                        popup?.cancel()
+                    }
                 }
-            })
-
-            // 布局
-            panel.add(searchField, BorderLayout.NORTH)
-            panel.add(JBScrollPane(list), BorderLayout.CENTER)
-            panel.preferredSize = Dimension(600, 400)
-
-            return panel
-        }
-
-        override fun getPreferredFocusedComponent(): JComponent {
-            return searchField
-        }
-
-        private fun filterList() {
-            val searchText = searchField.text.trim().lowercase()
-            listModel.clear()
-            if (searchText.isNotEmpty()) {
-                allApis.filter { api ->
-                    api.fullPath.lowercase().contains(searchText) ||
-                    api.httpMethod.lowercase().contains(searchText)
-                }.forEach { listModel.addElement(it) }
             }
-            if (listModel.size > 0) {
-                list.selectedIndex = 0
-            }
-        }
+        })
 
-        private fun navigateToSelected() {
-            val selected = list.selectedValue
-            if (selected != null) {
-                navigateTo(project, selected.psiMethod)
-                HistoryManager.getInstance().addHistory(selected.fullPath)
-                close(DialogWrapper.OK_EXIT_CODE)
+        // 鼠标双击跳转
+        list.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (e.clickCount == 2) {
+                    val selected = list.selectedValue
+                    if (selected != null) {
+                        navigateTo(project, selected.psiMethod)
+                        HistoryManager.getInstance().addHistory(selected.fullPath)
+                        popup?.cancel()
+                    }
+                }
             }
-        }
+        })
+
+        // 创建内容面板
+        val contentPanel = JPanel(BorderLayout())
+        contentPanel.add(searchField, BorderLayout.NORTH)
+        contentPanel.add(JBScrollPane(list), BorderLayout.CENTER)
+
+        // 创建弹窗
+        popup = JBPopupFactory.getInstance()
+            .createComponentPopupBuilder(contentPanel, searchField)
+            .setRequestFocus(true)
+            .setFocusable(true)
+            .setMovable(true)
+            .setResizable(true)
+            .setCancelOnClickOutside(true)
+            .setMinSize(Dimension(500, 300))
+            .createPopup()
+
+        popup.showInFocusCenter()
     }
 
-    companion object {
-        fun navigateTo(project: Project, method: com.intellij.psi.PsiMethod) {
-            val descriptor = OpenFileDescriptor(
-                project,
-                method.containingFile.virtualFile,
-                method.textOffset
-            )
-            descriptor.navigate(true)
-        }
+    private fun navigateTo(project: Project, method: com.intellij.psi.PsiMethod) {
+        val descriptor = OpenFileDescriptor(
+            project,
+            method.containingFile.virtualFile,
+            method.textOffset
+        )
+        descriptor.navigate(true)
     }
 }
